@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/testing.dart';
 import 'package:rdm_weather_app/core/config/weather_api_config.dart';
@@ -40,7 +38,6 @@ void main() {
       );
 
       final result = await dataSource.getCurrentWeather(tCityName);
-      print('Result: $result');
       expect(result, equals(tWeatherModel));
     });
 
