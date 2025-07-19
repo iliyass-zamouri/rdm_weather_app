@@ -32,7 +32,7 @@ class WeatherPage extends StatelessWidget {
               const WeatherSearchSection(),
               const WeatherStatusSection(),
               const WeatherDisplaySection(),
-              const ForecastDisplaySection(),
+              Expanded(child: const ForecastDisplaySection()),
             ],
           ),
         ),
