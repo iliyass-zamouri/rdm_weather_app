@@ -38,7 +38,21 @@ class ForecastListingWidget extends StatelessWidget {
         padding: EdgeInsets.zero,
         itemCount: forecasts.length,
         itemBuilder: (context, index) {
-          return ForecastWidget(forecast: forecasts[index]);
+          final isEven = index % 2 == 0;
+          final beginOffset = isEven ? const Offset(-1, 0) : const Offset(1, 0);
+
+          return TweenAnimationBuilder<Offset>(
+            tween: Tween<Offset>(begin: beginOffset, end: Offset.zero),
+            duration: const Duration(milliseconds: 1200),
+            curve: Curves.easeOutBack,
+            builder: (context, offset, child) {
+              return Transform.translate(
+                offset: Offset(offset.dx * 100, 0),
+                child: child,
+              );
+            },
+            child: ForecastWidget(forecast: forecasts[index]),
+          );
         },
       ),
     );

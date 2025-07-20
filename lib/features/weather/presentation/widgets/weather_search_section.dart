@@ -38,6 +38,7 @@ class WeatherSearchSection extends HookConsumerWidget {
         onSuffix: () {
           final city = cityController.text.trim();
           if (city.isNotEmpty) {
+            FocusScope.of(context).unfocus();
             ref.read(weatherProvider.notifier).fetchWeather(city);
             ref.read(forecastProvider.notifier).fetchForecast(city);
           }
