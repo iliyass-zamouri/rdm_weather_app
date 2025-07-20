@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  AppColors._(); // Private constructor to prevent instantiation
+  AppColors._();
 
-  // static const _color = 0xFFA2291E;
   static const _color = 0xFF131b36;
 
   static const MaterialColor primarySwatch = MaterialColor(
-    _color, // Primary color
+    _color,
     <int, Color>{
       50: Color(_color), // 10%
       100: Color(_color), // 20%

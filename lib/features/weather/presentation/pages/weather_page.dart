@@ -19,11 +19,11 @@ class WeatherPage extends StatelessWidget {
               end: Alignment.bottomRight,
               stops: [0.0, 0.1, 0.3, 0.6, 0.8],
               colors: [
-                Color.fromARGB(255, 8, 48, 108), // Deep blue
-                Color(0xFF0D47A1), // Deep blue
-                Color(0xFF0D47A1), // Deep blue
-                Color(0xFF1976D2), // Blue
-                Color(0xFF64B5F6), // Light blue
+                Color(0xFF08306C),
+                Color(0xFF0D47A1),
+                Color(0xFF0D47A1),
+                Color(0xFF1976D2),
+                Color(0xFF64B5F6),
               ],
             ),
           ),

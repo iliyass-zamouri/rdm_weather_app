@@ -10,13 +10,9 @@ class WeatherSearchField extends StatelessWidget {
   final Object? clear;
   final Object? suffix;
   final double? iconSize;
-  final bool overallMargin;
   final TextInputType? keyboardType;
-  final int maxLines;
-  final bool? obscure;
   final bool disabled;
   final bool isLoading;
-  final bool important;
   final Function(String)? onChanged;
   final VoidCallback? onClear;
   final VoidCallback? onSuffix;
@@ -27,14 +23,10 @@ class WeatherSearchField extends StatelessWidget {
     this.controller,
     this.clear,
     this.suffix,
-    this.overallMargin = true,
     this.iconSize = 20,
     this.keyboardType,
-    this.maxLines = 1,
-    this.obscure,
     this.disabled = false,
     this.isLoading = false,
-    this.important = true,
     this.onChanged,
     this.onClear,
     this.onSuffix,
@@ -43,9 +35,7 @@ class WeatherSearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: overallMargin
-          ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
-          : EdgeInsets.zero,
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       constraints: const BoxConstraints(minHeight: 50),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -54,13 +44,9 @@ class WeatherSearchField extends StatelessWidget {
           BoxShadow(
             color: Colors.black26,
             blurRadius: 4,
-            offset: const Offset(0, 2), // changes position of shadow
+            offset: const Offset(0, 2),
           ),
         ],
-        // border: Border.all(
-        //   color: Colors.grey.withOpacity(0.5),
-        //   width: 1,
-        // ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -70,8 +56,6 @@ class WeatherSearchField extends StatelessWidget {
             child: TextFormField(
               initialValue: defaultValue,
               controller: controller,
-              maxLines: maxLines,
-              minLines: 1,
               maxLengthEnforcement: MaxLengthEnforcement.none,
               decoration: InputDecoration(
                 hintText: label,
@@ -86,21 +70,15 @@ class WeatherSearchField extends StatelessWidget {
                   color: Colors.grey,
                   fontSize: 14,
                 ),
-
-                // prefixText: prefix,
                 border: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(8)),
                   borderSide: BorderSide.none,
                 ),
               ),
-              obscureText: obscure ?? false,
               enabled: !disabled,
               onChanged: onChanged,
-              validator: (value) => important
-                  ? (value == null || value.isEmpty
-                      ? 'Ce champ est requis'
-                      : null)
-                  : null,
+              validator: (value) =>
+                  value == null || value.isEmpty ? 'Ce champ est requis' : null,
               keyboardType: keyboardType ?? TextInputType.text,
             ),
           ),

@@ -26,7 +26,6 @@ void main() async {
   );
   final repository = WeatherRepositoryImpl(remoteDataSource);
 
-  // Initialize use cases
   final getWeather = GetWeather(repository);
   final getForecast = GetForecast(repository);
 
