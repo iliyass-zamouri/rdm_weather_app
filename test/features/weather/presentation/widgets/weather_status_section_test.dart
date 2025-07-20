@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -10,64 +11,68 @@ import '../../fakes/fake_forecast_notifiers.dart';
 import '../../fakes/fake_weather_notifiers.dart';
 
 void main() {
-  testWidgets(
-      'displays loading state in StatusBar when either provider is loading',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          weatherProvider.overrideWith((ref) => FakeLoadingWeatherNotifier()),
-          forecastProvider.overrideWith((ref) => FakeInitialForecastNotifier()),
-        ],
-        child: const MaterialApp(
-          home: Scaffold(body: WeatherStatusSection()),
+  group('WeatherStatusSection', () {
+    testWidgets('shows loading indicator when any provider is loading',
+        (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            weatherProvider.overrideWith((ref) => FakeLoadingWeatherNotifier()),
+            forecastProvider
+                .overrideWith((ref) => FakeInitialForecastNotifier()),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(body: WeatherStatusSection()),
+          ),
         ),
-      ),
-    );
+      );
+      // StatusBar.loading() returns a CircularProgressIndicator
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(StatusBar),
+          findsNothing); // StatusBar is not a widget class
+      expect(find.byType(SizedBox), findsNothing);
+      expect(find.textContaining('error'), findsNothing);
+    });
 
-    final statusBarFinder = find.byType(StatusBar);
-    expect(statusBarFinder, findsOneWidget);
-
-    final statusBarWidget = tester.widget<StatusBar>(statusBarFinder);
-    expect(statusBarWidget.isLoading, isTrue);
-    expect(statusBarWidget.errorMessage, isNull);
-  });
-
-  testWidgets('displays error message in StatusBar from forecastProvider',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          weatherProvider.overrideWith((ref) => FakeInitialWeatherNotifier()),
-          forecastProvider.overrideWith((ref) => FakeErrorForecastNotifier()),
-        ],
-        child: const MaterialApp(
-          home: Scaffold(body: WeatherStatusSection()),
+    testWidgets('shows error message from forecastProvider', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            weatherProvider.overrideWith((ref) => FakeInitialWeatherNotifier()),
+            forecastProvider.overrideWith((ref) => FakeErrorForecastNotifier()),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(body: WeatherStatusSection()),
+          ),
         ),
-      ),
-    );
+      );
+      // StatusBar.error() returns an Icon and a Text
+      expect(
+          find.byIcon(CupertinoIcons.exclamationmark_triangle), findsOneWidget);
+      expect(find.text('API down'), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
 
-    final statusBarWidget = tester.widget<StatusBar>(find.byType(StatusBar));
-    expect(statusBarWidget.isLoading, isFalse);
-    expect(statusBarWidget.errorMessage, equals("API down"));
-  });
-
-  testWidgets('shows nothing loading and no error when both are initial',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          weatherProvider.overrideWith((ref) => FakeInitialWeatherNotifier()),
-          forecastProvider.overrideWith((ref) => FakeInitialForecastNotifier()),
-        ],
-        child: const MaterialApp(
-          home: Scaffold(body: WeatherStatusSection()),
+    testWidgets('shows nothing when both providers are initial',
+        (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            weatherProvider.overrideWith((ref) => FakeInitialWeatherNotifier()),
+            forecastProvider
+                .overrideWith((ref) => FakeInitialForecastNotifier()),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(body: WeatherStatusSection()),
+          ),
         ),
-      ),
-    );
-
-    final statusBarWidget = tester.widget<StatusBar>(find.byType(StatusBar));
-    expect(statusBarWidget.isLoading, isFalse);
-    expect(statusBarWidget.errorMessage, isNull);
+      );
+      // Should only show SizedBox.shrink()
+      expect(find.byType(SizedBox), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(
+          find.byIcon(CupertinoIcons.exclamationmark_triangle), findsNothing);
+      expect(find.textContaining('error'), findsNothing);
+    });
   });
 }

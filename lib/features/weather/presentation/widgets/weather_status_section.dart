@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../providers/weather_provider.dart';
@@ -28,12 +29,15 @@ class WeatherStatusSection extends ConsumerWidget {
           orElse: () => null,
         );
 
-    if (isLoading || errorMessage != null) {
+    if (isLoading) {
       return StatusBar.loading();
     }
 
     if (errorMessage != null) {
-      return StatusBar.error(message: errorMessage);
+      return StatusBar.error(
+        icon: CupertinoIcons.exclamationmark_triangle,
+        message: errorMessage,
+      );
     }
 
     return const SizedBox.shrink();
