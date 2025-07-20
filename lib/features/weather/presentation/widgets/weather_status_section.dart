@@ -27,6 +27,15 @@ class WeatherStatusSection extends ConsumerWidget {
           error: (msg) => msg,
           orElse: () => null,
         );
-    return StatusBar(isLoading: isLoading, errorMessage: errorMessage);
+
+    if (isLoading || errorMessage != null) {
+      return StatusBar.loading();
+    }
+
+    if (errorMessage != null) {
+      return StatusBar.error(message: errorMessage);
+    }
+
+    return const SizedBox.shrink();
   }
 }

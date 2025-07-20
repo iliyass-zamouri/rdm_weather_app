@@ -1,37 +1,68 @@
 import 'package:flutter/material.dart';
 
-class StatusBar extends StatelessWidget {
-  final bool isLoading;
-  final String? errorMessage;
-
-  const StatusBar({super.key, required this.isLoading, this.errorMessage});
-
-  @override
-  Widget build(BuildContext context) {
-    if (isLoading) {
-      return Center(
-        child: const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: CircularProgressIndicator(
-            color: Colors.white,
-          ),
+class StatusBar {
+  static Widget loading() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 32.0),
+      child: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
         ),
-      );
-    }
+      ),
+    );
+  }
 
-    if (errorMessage != null && errorMessage!.isNotEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            errorMessage!,
-            style: const TextStyle(color: Colors.white),
-            textAlign: TextAlign.center,
-          ),
+  static Widget error({IconData? icon, String? message}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 32.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 64,
+                color: Colors.white,
+              ),
+              SizedBox(height: 8),
+            ],
+            if (message != null)
+              Text(
+                message,
+                style: TextStyle(color: Colors.white),
+              ),
+          ],
         ),
-      );
-    }
+      ),
+    );
+  }
 
-    return const SizedBox.shrink();
+  static Widget initial({IconData? icon, String? message}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 32.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 64,
+                color: Colors.white,
+              ),
+              SizedBox(height: 8),
+            ],
+            if (message != null)
+              Text(
+                message,
+                style: TextStyle(color: Colors.white),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
