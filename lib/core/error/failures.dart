@@ -1,4 +1,14 @@
-abstract class Failure {}
+import 'package:equatable/equatable.dart';
+
+abstract class Failure with EquatableMixin {
+  @override
+  List<Object?> get props => [];
+
+  String get message => toString();
+
+  @override
+  String toString() => message;
+}
 
 class ServerFailure extends Failure {
   @override

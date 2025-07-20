@@ -21,6 +21,7 @@ dependencies:
   flutter_hooks: ^0.20.5
   http: ^1.4.0
   dartz: ^0.10.1
+  equatable: ^2.0.7
 
 
 dev_dependencies:
