@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+/// Base class for failures
 abstract class Failure with EquatableMixin {
   @override
   List<Object?> get props => [];

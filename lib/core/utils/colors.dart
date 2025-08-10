@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// App color palette
 class AppColors {
   AppColors._();
 
@@ -8,16 +9,16 @@ class AppColors {
   static const MaterialColor primarySwatch = MaterialColor(
     _color,
     <int, Color>{
-      50: Color(_color), // 10%
-      100: Color(_color), // 20%
-      200: Color(_color), // 30%
-      300: Color(_color), // 40%
-      400: Color(_color), // 50%
-      500: Color(_color), // 60%
-      600: Color(_color), // 70%
-      700: Color(_color), // 80%
-      800: Color(_color), // 90%
-      900: Color(_color), // 100%
+      50: Color(_color),
+      100: Color(_color),
+      200: Color(_color),
+      300: Color(_color),
+      400: Color(_color),
+      500: Color(_color),
+      600: Color(_color),
+      700: Color(_color),
+      800: Color(_color),
+      900: Color(_color),
     },
   );
   static const Color primary = Color(0xFF000000);

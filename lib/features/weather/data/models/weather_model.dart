@@ -8,6 +8,7 @@ part 'weather_model.g.dart';
 class WeatherModel with _$WeatherModel {
   const WeatherModel._();
 
+  /// WeatherModel data transfer object (DTO)
   const factory WeatherModel({
     required String cityName,
     required double temperature,
@@ -18,6 +19,7 @@ class WeatherModel with _$WeatherModel {
   factory WeatherModel.fromJson(Map<String, dynamic> json) =>
       _$WeatherModelFromJson(json);
 
+  /// Factory for creating WeatherModel from API response
   factory WeatherModel.fromApi(Map<String, dynamic> json) {
     return WeatherModel(
       cityName: json['name'],
@@ -26,6 +28,8 @@ class WeatherModel with _$WeatherModel {
       icon: json['weather'][0]['icon'],
     );
   }
+
+  /// Convert to domain entity
   Weather toEntity() => Weather(
         cityName: cityName,
         temperature: temperature,

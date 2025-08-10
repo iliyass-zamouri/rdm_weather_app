@@ -1,21 +1,22 @@
-class WeatherApiConfig {
-  final String baseUrl;
-  final String currentWeatherEndpoint;
-  final String forecastEndpoint;
+/// Abstracts API configuration and endpoint construction.
+abstract class WeatherApiConfig {
+  Uri getUri(String endpoint, String city);
+}
 
-  const WeatherApiConfig({
+/// Default implementation for OpenWeatherMap API.
+class WeatherApiConfigImpl implements WeatherApiConfig {
+  final String baseUrl;
+  final String apiKey;
+
+  const WeatherApiConfigImpl({
     this.baseUrl = 'https://api.openweathermap.org/data/2.5',
-    this.currentWeatherEndpoint = '/weather',
-    this.forecastEndpoint = '/forecast',
+    this.apiKey = '',
   });
 
-  Uri currentWeatherUri(String city, String apiKey) {
+  @override
+  Uri getUri(String endpoint, String city) {
     return Uri.parse(
-        '$baseUrl$currentWeatherEndpoint?q=$city&appid=$apiKey&units=metric');
-  }
-
-  Uri forecastUri(String city, String apiKey) {
-    return Uri.parse(
-        '$baseUrl$forecastEndpoint?q=$city&appid=$apiKey&units=metric');
+      '$baseUrl$endpoint?q=$city&appid=$apiKey&units=metric',
+    );
   }
 }

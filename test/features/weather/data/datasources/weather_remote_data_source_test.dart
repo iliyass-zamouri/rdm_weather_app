@@ -2,7 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/testing.dart';
 import 'package:rdm_weather_app/core/config/weather_api_config.dart';
 import 'package:rdm_weather_app/core/error/exceptions.dart';
-import 'package:rdm_weather_app/features/weather/data/datasources/weather_remote_data_source.dart';
+import 'package:rdm_weather_app/features/weather/data/datasources/impl/current_weather_remote_data_source_impl.dart';
+import 'package:rdm_weather_app/features/weather/data/datasources/impl/forecast_remote_data_source_impl.dart';
 import 'package:rdm_weather_app/features/weather/data/models/weather_model.dart';
 import 'package:rdm_weather_app/features/weather/data/models/forecast_model.dart';
 import 'package:http/http.dart' as http;
@@ -11,7 +12,7 @@ void main() {
   late WeatherApiConfig weatherApiConfig;
 
   setUp(() {
-    weatherApiConfig = WeatherApiConfig();
+    weatherApiConfig = WeatherApiConfigImpl();
   });
 
   group('getCurrentWeather', () {
@@ -24,7 +25,7 @@ void main() {
     );
 
     test('should return WeatherModel when the response is 200', () async {
-      final url = weatherApiConfig.currentWeatherUri(tCityName, 'fake_api_key');
+      final url = weatherApiConfig.getUri('/weather', tCityName);
       final mockHttpClient = MockClient((request) async {
         expect(request.url.toString(), url.toString());
         return http.Response(
@@ -34,26 +35,26 @@ void main() {
       });
       final dataSource = WeatherRemoteDataSourceImpl(
         client: mockHttpClient,
-        apiKey: 'fake_api_key',
+        config: weatherApiConfig,
       );
 
-      final result = await dataSource.getCurrentWeather(tCityName);
+      final result = await dataSource.getWeather(tCityName);
       expect(result, equals(tWeatherModel));
     });
 
     test('should throw ServerException when the response is not 200', () async {
-      final url = weatherApiConfig.currentWeatherUri(tCityName, 'fake_api_key');
+      final url = weatherApiConfig.getUri('/weather', tCityName);
       final mockHttpClient = MockClient((request) async {
         expect(request.url.toString(), url.toString());
         return http.Response('Something went wrong', 500);
       });
       final dataSource = WeatherRemoteDataSourceImpl(
         client: mockHttpClient,
-        apiKey: 'fake_api_key',
+        config: weatherApiConfig,
       );
 
       expect(
-        () => dataSource.getCurrentWeather(tCityName),
+        () => dataSource.getWeather(tCityName),
         throwsA(isA<ServerException>()),
       );
     });
@@ -73,7 +74,7 @@ void main() {
 
     test('should return List<ForecastModel> when the response is 200',
         () async {
-      final url = weatherApiConfig.forecastUri(tCityName, 'fake_api_key');
+      final url = weatherApiConfig.getUri('/forecast', tCityName);
       final mockHttpClient = MockClient((request) async {
         expect(request.url.toString(), url.toString());
         return http.Response(
@@ -81,24 +82,24 @@ void main() {
           200,
         );
       });
-      final dataSource = WeatherRemoteDataSourceImpl(
+      final dataSource = ForecastRemoteDataSourceImpl(
         client: mockHttpClient,
-        apiKey: 'fake_api_key',
+        config: weatherApiConfig,
       );
 
       final result = await dataSource.getWeatherForecast(tCityName);
-      expect(result.take(2).toList(), equals(tForecastModels));
+      expect(result.take(1).toList(), equals(tForecastModels));
     });
 
     test('should throw ServerException when the response is not 200', () async {
-      final url = weatherApiConfig.forecastUri(tCityName, 'fake_api_key');
+      final url = weatherApiConfig.getUri('/forecast', tCityName);
       final mockHttpClient = MockClient((request) async {
         expect(request.url.toString(), url.toString());
         return http.Response('Something went wrong', 500);
       });
-      final dataSource = WeatherRemoteDataSourceImpl(
+      final dataSource = ForecastRemoteDataSourceImpl(
         client: mockHttpClient,
-        apiKey: 'fake_api_key',
+        config: weatherApiConfig,
       );
 
       expect(

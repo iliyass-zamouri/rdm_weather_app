@@ -2,32 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rdm_weather_app/core/utils/colors.dart';
 import 'package:rdm_weather_app/core/utils/constants.dart';
-import 'package:rdm_weather_app/features/weather/domain/usecases/get_forecast.dart';
-import 'package:rdm_weather_app/features/weather/presentation/providers/forecast_provider.dart';
-import 'features/weather/data/datasources/weather_remote_data_source.dart';
+import 'package:rdm_weather_app/features/weather/data/datasources/impl/current_weather_remote_data_source_impl.dart';
+import 'package:rdm_weather_app/features/weather/data/datasources/impl/forecast_remote_data_source_impl.dart';
+import 'package:rdm_weather_app/features/weather/data/repositories/forecast_repository_impl.dart';
+import 'package:rdm_weather_app/features/weather/presentation/pages/weather_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/di/di.dart';
 import 'features/weather/data/repositories/weather_repository_impl.dart';
 import 'features/weather/domain/usecases/get_weather.dart';
-import 'features/weather/presentation/pages/weather_page.dart';
-import 'features/weather/presentation/providers/weather_provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'features/weather/domain/usecases/get_forecast.dart';
 import 'package:http/http.dart' as http;
+import 'package:rdm_weather_app/core/config/weather_api_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await dotenv.load(fileName: '.env');
+  await configureDependencies();
 
   final client = http.Client();
   final apiKey = dotenv.env[Constants.weatherApiKeyName] ?? '';
+  final apiConfig = WeatherApiConfigImpl(apiKey: apiKey);
 
-  final remoteDataSource = WeatherRemoteDataSourceImpl(
+  final weatherRemoteDataSource = WeatherRemoteDataSourceImpl(
     client: client,
-    apiKey: apiKey,
+    config: apiConfig,
   );
-  final repository = WeatherRepositoryImpl(remoteDataSource);
+  final forecastRemoteDataSource = ForecastRemoteDataSourceImpl(
+    client: client,
+    config: apiConfig,
+  );
 
-  final getWeather = GetWeather(repository);
-  final getForecast = GetForecast(repository);
+  final weatherRepository =
+      WeatherRepositoryImpl(weatherRemoteDataSource);
+  final forecastRepository = ForecastRepositoryImpl(forecastRemoteDataSource);
+
+  final getWeather = GetWeather(weatherRepository);
+  final getForecast = GetForecast(forecastRepository);
 
   runApp(ProviderScope(
     overrides: [
