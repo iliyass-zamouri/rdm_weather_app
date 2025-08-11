@@ -1,12 +1,10 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rdm_weather_app/features/weather/data/datasources/impl/current_weather_remote_data_source_impl.dart';
-import 'package:rdm_weather_app/features/weather/data/datasources/impl/forecast_remote_data_source_impl.dart';
-import 'package:rdm_weather_app/features/weather/data/repositories/forecast_repository_impl.dart';
+import 'package:rdm_weather_app/features/forecast/data/datasources/forecast_remote_data_source_impl.dart';
+import 'package:rdm_weather_app/features/forecast/data/repositories/forecast_repository_impl.dart';
+import 'package:rdm_weather_app/features/forecast/domain/repositories/forecast_repository.dart';
+import 'package:rdm_weather_app/features/weather/data/datasources/weather_remote_data_source_impl.dart';
 import 'package:rdm_weather_app/features/weather/data/repositories/weather_repository_impl.dart';
 import 'package:rdm_weather_app/features/weather/domain/repositories/weather_repository.dart';
-import 'package:rdm_weather_app/features/weather/domain/repositories/forecast_repository.dart';
-import 'package:rdm_weather_app/features/weather/domain/usecases/get_forecast.dart';
-import 'package:rdm_weather_app/features/weather/domain/usecases/get_weather.dart';
 import 'package:rdm_weather_app/core/utils/constants.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -39,13 +37,6 @@ final forecastRepositoryProvider = Provider<ForecastRepository>((ref) {
   return ForecastRepositoryImpl(ref.read(forecastRemoteDataSourceProvider));
 });
 
-final getWeatherProvider = Provider<GetWeather>((ref) {
-  return GetWeather(ref.read(weatherRepositoryProvider));
-});
-
-final getForecastProvider = Provider<GetForecast>((ref) {
-  return GetForecast(ref.read(forecastRepositoryProvider));
-});
 
 Future<void> configureDependencies() async {
   await dotenv.load(fileName: '.env');
