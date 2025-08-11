@@ -1,144 +1,245 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:rdm_weather_app/core/error/exceptions.dart';
-import 'package:rdm_weather_app/features/weather/data/datasources/forecast_remote_data_source.dart';
-import 'package:rdm_weather_app/features/weather/data/models/weather_model.dart';
-import 'package:rdm_weather_app/features/weather/data/repositories/forecast_repository_impl.dart';
-import 'package:rdm_weather_app/features/weather/data/repositories/weather_repository_impl.dart';
-import 'package:rdm_weather_app/features/weather/data/datasources/weather_remote_data_source.dart';
-import 'package:rdm_weather_app/features/weather/domain/entities/weather.dart';
 import 'package:dartz/dartz.dart';
+import 'package:rdm_weather_app/core/error/exceptions.dart';
 import 'package:rdm_weather_app/core/error/failures.dart';
-import 'package:rdm_weather_app/features/weather/data/models/forecast_model.dart';
+import 'package:rdm_weather_app/features/weather/data/datasources/weather_remote_data_source.dart';
+import 'package:rdm_weather_app/features/weather/data/models/weather_model.dart';
+import 'package:rdm_weather_app/features/weather/data/repositories/weather_repository_impl.dart';
 
-class FakeWeatherRemoteDataSource implements WeatherRemoteDataSource {
-  WeatherModel? weatherModel;
-  Exception? exception;
+class MockWeatherRemoteDataSource implements WeatherRemoteDataSource {
+  Future<WeatherModel> Function(String)? _getFunction;
 
-  @override
-  Future<WeatherModel> getWeather(String cityName) async {
-    if (exception != null) throw exception!;
-    if (weatherModel != null) return weatherModel!;
-    throw UnimplementedError();
+  void setGetFunction(Future<WeatherModel> Function(String) function) {
+    _getFunction = function;
   }
-}
-
-class FakeForecastRemoteDataSource implements ForecastRemoteDataSource {
-  List<ForecastModel>? forecastModels;
-  Exception? exception;
 
   @override
-  Future<List<ForecastModel>> getWeatherForecast(String cityName) async {
-    if (exception != null) throw exception!;
-    if (forecastModels != null) return forecastModels!;
+  Future<WeatherModel> get(String city) async {
+    if (_getFunction != null) {
+      return _getFunction!(city);
+    }
     throw UnimplementedError();
   }
 }
 
 void main() {
-  late WeatherRepositoryImpl weatherRepository;
-  late ForecastRepositoryImpl forecastRepository;
-  late FakeWeatherRemoteDataSource fakeWeatherDataSource;
-  late FakeForecastRemoteDataSource fakeForecastDataSource;
+  group('WeatherRepositoryImpl', () {
+    late WeatherRepositoryImpl repository;
+    late MockWeatherRemoteDataSource mockRemoteDataSource;
 
-  setUp(() {
-    fakeWeatherDataSource = FakeWeatherRemoteDataSource();
-    fakeForecastDataSource = FakeForecastRemoteDataSource();
-    weatherRepository = WeatherRepositoryImpl(fakeWeatherDataSource);
-    forecastRepository = ForecastRepositoryImpl(fakeForecastDataSource);
-  });
-
-  group('getCurrentWeather', () {
-    final tWeatherModel = WeatherModel(
-      cityName: 'Paris',
-      temperature: 20.0,
-      description: 'Sunny',
-      icon: '01d',
-    );
-    final tWeather = Weather(
-      cityName: 'Paris',
-      temperature: 20.0,
-      description: 'Sunny',
-      icon: '01d',
-    );
-
-    test('returns Weather on success', () async {
-      fakeWeatherDataSource.weatherModel = tWeatherModel;
-      final result = await weatherRepository.getCurrentWeather('Paris');
-      expect(result, Right(tWeather));
+    setUp(() {
+      mockRemoteDataSource = MockWeatherRemoteDataSource();
+      repository = WeatherRepositoryImpl(mockRemoteDataSource);
     });
 
-    test('returns NotFoundFailure on NotFoundException', () async {
-      fakeWeatherDataSource.exception = NotFoundException();
-      final result = await weatherRepository.getCurrentWeather('Paris');
-      expect(result, Left(NotFoundFailure()));
-    });
-
-    test('returns NetworkFailure on NetworkException', () async {
-      fakeWeatherDataSource.exception = NetworkException();
-      final result = await weatherRepository.getCurrentWeather('Paris');
-      expect(result, Left(NetworkFailure()));
-    });
-
-    test('returns ServerFailure on ServerException', () async {
-      fakeWeatherDataSource.exception = ServerException();
-      final result = await weatherRepository.getCurrentWeather('Paris');
-      expect(result, Left(ServerFailure()));
-    });
-
-    test('returns UnexpectedFailure on unknown error', () async {
-      fakeWeatherDataSource.exception = Exception('Unknown');
-      final result = await weatherRepository.getCurrentWeather('Paris');
-      expect(result, Left(UnexpectedFailure()));
-    });
-  });
-
-  group('getWeatherForecast', () {
-    final tForecastModels = [
-      ForecastModel(
-        day: '2025-07-19',
-        minTemp: 15.0,
-        maxTemp: 25.0,
-        description: 'Sunny',
+    group('get', () {
+      const tCity = 'Paris';
+      final tWeatherModel = WeatherModel(
+        cityName: 'Paris',
+        temperature: 25.0,
+        description: 'Clear sky',
         icon: '01d',
-      ),
-      ForecastModel(
-        day: '2025-07-20',
-        minTemp: 16.0,
-        maxTemp: 22.0,
-        description: 'Cloudy',
-        icon: '02d',
-      ),
-    ];
-    final tForecasts = tForecastModels.map((f) => f.toEntity()).toList();
+      );
+      final tWeather = tWeatherModel.toEntity();
 
-    test('returns Forecast list on success', () async {
-      fakeForecastDataSource.forecastModels = tForecastModels;
-      final result = await forecastRepository.getWeatherForecast('Paris');
-      expect(result.getOrElse(() => []), tForecasts);
-    });
+      test('should return Weather when remote data source is successful', () async {
+        // Arrange
+        mockRemoteDataSource.setGetFunction((_) async => tWeatherModel);
 
-    test('returns NotFoundFailure on NotFoundException', () async {
-      fakeForecastDataSource.exception = NotFoundException();
-      final result = await forecastRepository.getWeatherForecast('Paris');
-      expect(result, Left(NotFoundFailure()));
-    });
+        // Act
+        final result = await repository.get(tCity);
 
-    test('returns NetworkFailure on NetworkException', () async {
-      fakeForecastDataSource.exception = NetworkException();
-      final result = await forecastRepository.getWeatherForecast('Paris');
-      expect(result, Left(NetworkFailure()));
-    });
+        // Assert
+        expect(result, Right(tWeather));
+        expect(result.fold(
+          (failure) => failure,
+          (weather) => weather,
+        ), tWeather);
+      });
 
-    test('returns ServerFailure on ServerException', () async {
-      fakeForecastDataSource.exception = ServerException();
-      final result = await forecastRepository.getWeatherForecast('Paris');
-      expect(result, Left(ServerFailure()));
-    });
+      test('should return ServerFailure when remote data source throws ServerException', () async {
+        // Arrange
+        mockRemoteDataSource.setGetFunction((_) async => throw ServerException('Server error'));
 
-    test('returns UnexpectedFailure on unknown error', () async {
-      fakeForecastDataSource.exception = Exception('Unknown');
-      final result = await forecastRepository.getWeatherForecast('Paris');
-      expect(result, Left(UnexpectedFailure()));
+        // Act
+        final result = await repository.get(tCity);
+
+        // Assert
+        expect(result, Left(ServerFailure()));
+        expect(result.fold(
+          (failure) => failure,
+          (weather) => weather,
+        ), isA<ServerFailure>());
+      });
+
+      test('should return NetworkFailure when remote data source throws NetworkException', () async {
+        // Arrange
+        mockRemoteDataSource.setGetFunction((_) async => throw NetworkException());
+
+        // Act
+        final result = await repository.get(tCity);
+
+        // Assert
+        expect(result, Left(NetworkFailure()));
+        expect(result.fold(
+          (failure) => failure,
+          (weather) => weather,
+        ), isA<NetworkFailure>());
+      });
+
+      test('should return NotFoundFailure when remote data source throws NotFoundException', () async {
+        // Arrange
+        mockRemoteDataSource.setGetFunction((_) async => throw NotFoundException('City not found'));
+
+        // Act
+        final result = await repository.get(tCity);
+
+        // Assert
+        expect(result, Left(NotFoundFailure()));
+        expect(result.fold(
+          (failure) => failure,
+          (weather) => weather,
+        ), isA<NotFoundFailure>());
+      });
+
+      test('should handle different city names correctly', () async {
+        // Arrange
+        const cityName = 'London';
+        final weatherModel = WeatherModel(
+          cityName: cityName,
+          temperature: 18.0,
+          description: 'Cloudy',
+          icon: '03d',
+        );
+        mockRemoteDataSource.setGetFunction((_) async => weatherModel);
+
+        // Act
+        final result = await repository.get(cityName);
+
+        // Assert
+        expect(result, Right(weatherModel.toEntity()));
+        result.fold(
+          (failure) => fail('Expected success but got failure: $failure'),
+          (weather) {
+            expect(weather.cityName, cityName);
+            expect(weather.temperature, 18.0);
+            expect(weather.description, 'Cloudy');
+            expect(weather.icon, '03d');
+          },
+        );
+      });
+
+      test('should handle negative temperatures correctly', () async {
+        // Arrange
+        const cityName = 'Moscow';
+        final weatherModel = WeatherModel(
+          cityName: cityName,
+          temperature: -10.0,
+          description: 'Snow',
+          icon: '13d',
+        );
+        mockRemoteDataSource.setGetFunction((_) async => weatherModel);
+
+        // Act
+        final result = await repository.get(cityName);
+
+        // Assert
+        expect(result, Right(weatherModel.toEntity()));
+        result.fold(
+          (failure) => fail('Expected success but got failure: $failure'),
+          (weather) {
+            expect(weather.temperature, -10.0);
+            expect(weather.temperatureInCelsius, '-10°');
+          },
+        );
+      });
+
+      test('should handle high temperatures correctly', () async {
+        // Arrange
+        const cityName = 'Dubai';
+        final weatherModel = WeatherModel(
+          cityName: cityName,
+          temperature: 45.0,
+          description: 'Very hot',
+          icon: '01d',
+        );
+        mockRemoteDataSource.setGetFunction((_) async => weatherModel);
+
+        // Act
+        final result = await repository.get(cityName);
+
+        // Assert
+        expect(result, Right(weatherModel.toEntity()));
+        result.fold(
+          (failure) => fail('Expected success but got failure: $failure'),
+          (weather) {
+            expect(weather.temperature, 45.0);
+            expect(weather.temperatureInCelsius, '45°');
+          },
+        );
+      });
+
+      test('should handle decimal temperatures correctly', () async {
+        // Arrange
+        const cityName = 'Tokyo';
+        final weatherModel = WeatherModel(
+          cityName: cityName,
+          temperature: 22.7,
+          description: 'Partly cloudy',
+          icon: '02d',
+        );
+        mockRemoteDataSource.setGetFunction((_) async => weatherModel);
+
+        // Act
+        final result = await repository.get(cityName);
+
+        // Assert
+        expect(result, Right(weatherModel.toEntity()));
+        result.fold(
+          (failure) => fail('Expected success but got failure: $failure'),
+          (weather) {
+            expect(weather.temperature, 22.7);
+            expect(weather.temperatureInCelsius, '23°'); // Should round to nearest integer
+          },
+        );
+      });
+
+      test('should handle different weather descriptions correctly', () async {
+        // Arrange
+        const cityName = 'Sydney';
+        final weatherModel = WeatherModel(
+          cityName: cityName,
+          temperature: 30.0,
+          description: 'Heavy rain',
+          icon: '09d',
+        );
+        mockRemoteDataSource.setGetFunction((_) async => weatherModel);
+
+        // Act
+        final result = await repository.get(cityName);
+
+        // Assert
+        expect(result, Right(weatherModel.toEntity()));
+        result.fold(
+          (failure) => fail('Expected success but got failure: $failure'),
+          (weather) {
+            expect(weather.description, 'Heavy rain');
+            expect(weather.icon, '09d');
+            expect(weather.iconUrl, 'http://openweathermap.org/img/wn/09d@4x.png');
+          },
+        );
+      });
+
+      test('should throw exception when remote data source throws unexpected exception', () async {
+        // Arrange
+        mockRemoteDataSource.setGetFunction((_) async => throw Exception('Unexpected error'));
+
+        // Act & Assert
+        expect(
+          () => repository.get(tCity),
+          throwsA(isA<Exception>()),
+        );
+      });
     });
   });
 }

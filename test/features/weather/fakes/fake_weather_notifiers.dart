@@ -1,5 +1,5 @@
 import 'package:rdm_weather_app/features/weather/presentation/providers/weather_provider.dart';
-import 'package:rdm_weather_app/features/weather/presentation/providers/weather_state.dart';
+import 'package:rdm_weather_app/features/weather/presentation/state/weather_state.dart';
 import 'package:rdm_weather_app/features/weather/domain/usecases/get_weather.dart';
 import 'package:rdm_weather_app/features/weather/domain/entities/weather.dart';
 import 'package:dartz/dartz.dart';
