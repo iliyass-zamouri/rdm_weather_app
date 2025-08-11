@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:rdm_weather_app/core/config/weather_api_config.dart';
+import 'package:rdm_weather_app/core/config/weather_api_config_interface.dart';
 import 'package:rdm_weather_app/core/error/exceptions.dart';
 
 abstract class BaseRemoteDataSource {

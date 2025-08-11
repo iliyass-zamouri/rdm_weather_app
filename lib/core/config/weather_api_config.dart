@@ -1,9 +1,5 @@
-/// Abstracts API configuration and endpoint construction.
-abstract class WeatherApiConfig {
-  Uri getUri(String endpoint, String city);
-}
+import 'package:rdm_weather_app/core/config/weather_api_config_interface.dart';
 
-/// Default implementation for OpenWeatherMap API.
 class WeatherApiConfigImpl implements WeatherApiConfig {
   final String baseUrl;
   final String apiKey;
@@ -15,8 +11,12 @@ class WeatherApiConfigImpl implements WeatherApiConfig {
 
   @override
   Uri getUri(String endpoint, String city) {
-    return Uri.parse(
-      '$baseUrl$endpoint?q=$city&appid=$apiKey&units=metric',
+    return Uri.parse('$baseUrl$endpoint').replace(
+      queryParameters: {
+        'q': city,
+        'appid': apiKey,
+        'units': 'metric',
+      },
     );
   }
 }
