@@ -1,6 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rdm_weather_app/features/forecast/data/providers/forecast_repository_provider.dart';
 import '../../domain/usecases/get_forecast.dart';
-import 'forecast_state.dart';
+import '../state/forecast_state.dart';
 
 final forecastProvider =
     StateNotifierProvider<ForecastNotifier, ForecastState>((ref) {
@@ -9,7 +10,7 @@ final forecastProvider =
 });
 
 final getForecastProvider = Provider<GetForecast>((ref) {
-  throw UnimplementedError();
+  return GetForecast(ref.read(forecastRepositoryProvider));
 });
 
 class ForecastNotifier extends StateNotifier<ForecastState> {

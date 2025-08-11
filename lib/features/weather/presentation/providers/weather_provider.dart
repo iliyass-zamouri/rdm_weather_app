@@ -1,6 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rdm_weather_app/features/weather/data/providers/weather_repository_provider.dart';
 import '../../domain/usecases/get_weather.dart';
-import 'weather_state.dart';
+import '../state/weather_state.dart';
 
 final weatherProvider =
     StateNotifierProvider<WeatherNotifier, WeatherState>((ref) {
@@ -9,7 +10,7 @@ final weatherProvider =
 });
 
 final getWeatherProvider = Provider<GetWeather>((ref) {
-  throw UnimplementedError();
+  return GetWeather(ref.read(weatherRepositoryProvider));
 });
 
 class WeatherNotifier extends StateNotifier<WeatherState> {
