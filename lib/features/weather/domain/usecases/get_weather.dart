@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
+import 'package:rdm_weather_app/features/weather/domain/entities/weather.dart';
+import 'package:rdm_weather_app/features/weather/domain/repositories/weather_repository.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
-import '../entities/weather.dart';
-import '../repositories/weather_repository.dart';
 
 class GetWeather implements UseCase<Weather, String> {
   final WeatherRepository repository;
@@ -10,6 +10,6 @@ class GetWeather implements UseCase<Weather, String> {
 
   @override
   Future<Either<Failure, Weather>> call(String city) async {
-    return await repository.getCurrentWeather(city);
+    return await repository.get(city);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:rdm_weather_app/core/config/weather_api_config.dart';
-import 'package:rdm_weather_app/features/weather/data/datasources/base_remote_data_source.dart';
 import 'package:rdm_weather_app/features/weather/data/datasources/weather_remote_data_source.dart';
+import 'package:rdm_weather_app/core/data/base_remote_data_source.dart';
 import 'package:rdm_weather_app/features/weather/data/models/weather_model.dart';
 
 class WeatherRemoteDataSourceImpl extends BaseRemoteDataSource
@@ -11,7 +11,7 @@ class WeatherRemoteDataSourceImpl extends BaseRemoteDataSource
   }) : super(config: config ?? WeatherApiConfigImpl());
 
   @override
-  Future<WeatherModel> getWeather(String city) {
+  Future<WeatherModel> get(String city) {
     final url = config.getUri('/weather', city);
     return getJson<WeatherModel>(url, (json) => WeatherModel.fromApi(json));
   }

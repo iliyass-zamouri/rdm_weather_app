@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rdm_weather_app/features/weather/presentation/widgets/status_bar.dart';
+import 'package:rdm_weather_app/core/utils/status_bar.dart';
 import '../providers/weather_provider.dart';
 import 'weather_widget.dart';
 

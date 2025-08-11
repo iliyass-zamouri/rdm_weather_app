@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rdm_weather_app/features/weather/domain/entities/forecast.dart';
-import 'package:rdm_weather_app/features/weather/presentation/widgets/forecast_widget.dart';
+import 'package:rdm_weather_app/features/forecast/domain/entities/forecast.dart';
+import 'package:rdm_weather_app/features/forecast/presentation/widgets/forecast_widget.dart';
 
 class ForecastListingWidget extends StatelessWidget {
   final List<Forecast> forecasts;

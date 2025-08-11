@@ -11,9 +11,9 @@ class WeatherRepositoryImpl implements WeatherRepository {
   WeatherRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<Either<Failure, Weather>> getCurrentWeather(String city) async {
+  Future<Either<Failure, Weather>> get(String city) async {
     try {
-      final weather = await remoteDataSource.getWeather(city);
+      final weather = await remoteDataSource.get(city);
       return Right(weather.toEntity());
     } on AppException catch (e) {
       return Left(e.toFailure());

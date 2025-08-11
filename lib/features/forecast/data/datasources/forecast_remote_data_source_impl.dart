@@ -1,8 +1,8 @@
 import 'package:rdm_weather_app/core/config/weather_api_config.dart';
 import 'package:rdm_weather_app/core/utils/date_helper.dart';
-import 'package:rdm_weather_app/features/weather/data/datasources/base_remote_data_source.dart';
-import 'package:rdm_weather_app/features/weather/data/datasources/forecast_remote_data_source.dart';
-import 'package:rdm_weather_app/features/weather/data/models/forecast_model.dart';
+import 'package:rdm_weather_app/features/forecast/data/datasources/forecast_remote_data_source.dart';
+import 'package:rdm_weather_app/features/forecast/data/models/forecast_model.dart';
+import 'package:rdm_weather_app/core/data/base_remote_data_source.dart';
 
 class ForecastRemoteDataSourceImpl extends BaseRemoteDataSource
     implements ForecastRemoteDataSource {
@@ -16,7 +16,7 @@ class ForecastRemoteDataSourceImpl extends BaseRemoteDataSource
         super(config: config ?? WeatherApiConfigImpl());
 
   @override
-  Future<List<ForecastModel>> getWeatherForecast(String city) {
+  Future<List<ForecastModel>> get(String city) {
     final url = config.getUri('/forecast', city);
     return getJson<List<ForecastModel>>(url, (json) => _parseForecast(json));
   }
